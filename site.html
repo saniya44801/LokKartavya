@@ -214,8 +214,42 @@
         .stat-item h4 { margin: 0 0 5px 0; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
         .stat-item p { margin: 0; font-weight: 600; font-size: 0.95rem; }
 
+        /* --- NEW: MyNeta API STYLES --- */
+        .btn-verify {
+            width: 100%;
+            background: #f1f2f6;
+            color: #2c3e50;
+            border: 1px solid #dfe4ea;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-verify:hover {
+            background: #dfe6e9;
+            border-color: #b2bec3;
+            transform: scale(1.02);
+        }
+
+        .myneta-box {
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .myneta-box.loading { background: #f8f9fa; color: #7f8c8d; }
+        .myneta-box.success { border-left: 4px solid #d35400; background: #fffcf5; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
         /* Commitment Tracker Styles */
-        .commitments-list { margin-top: 20px; }
+        .commitments-list { margin-top: 10px; }
         .commitment-item { margin-bottom: 15px; }
         .c-header { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; }
         .c-status { font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; }
@@ -307,7 +341,7 @@
             .report-section { flex-direction: column; }
             .report-visual { width: 100%; height: 200px; }
             nav { padding: 1rem; }
-            nav ul { display: none; } /* Simplified for mobile demo */
+            nav ul { display: none; }
         }
     </style>
 </head>
@@ -327,7 +361,7 @@
     <section class="hero">
         <div class="hero-content">
             <h1>Empowering Citizens with<br>Fact-Based Truths</h1>
-            <p>Bridge the gap between you and your government. [cite_start]Verified profiles, tracked commitments, and AI-simplified governance[cite: 26].</p>
+            <p>Bridge the gap between you and your government. Verified profiles, tracked commitments, and AI-simplified governance.</p>
             <button class="btn-cta" onclick="document.getElementById('leaders').scrollIntoView()">Explore Leaders</button>
         </div>
     </section>
@@ -375,7 +409,7 @@
             <div class="report-form">
                 <h3>Submit a Public Record</h3>
                 <p style="color: #666; font-size: 0.9rem; margin-bottom: 25px;">
-                    [cite_start]Upload a geo-tagged image. Our Cloud Vision AI validates the issue automatically[cite: 101].
+                    Upload a geo-tagged image. Our Cloud Vision AI validates the issue automatically.
                 </p>
                 <form onsubmit="handleSubmit(event)">
                     <div class="form-group">
@@ -408,44 +442,44 @@
     <div id="toast"><i class="fas fa-check-circle"></i> <span>Report Submitted Successfully!</span></div>
 
     <script>
-        // --- 1. MOCK DATA (Leader Profiles & Commitments) ---
+        // --- 1. MOCK DATA (Names match your Python Script for Demo) ---
         const leaders = [
             {
-                name: "Amit Sharma",
+                name: "Hema Malini", // Real MP
                 role: "Member of Parliament (MP)",
-                initials: "AS",
+                initials: "HM",
                 term: "2024 - 2029",
-                edu: "B.Tech, IIT Delhi",
+                edu: "PhD (Honorary), Dance",
                 commitments: [
-                    { title: "Smart City Traffic System", status: "Ongoing", css: "ongoing" },
-                    { title: "District Hospital Wing", status: "Completed", css: "completed" }
+                    { title: "Yamuna Cleaning Project", status: "Ongoing", css: "ongoing" },
+                    { title: "Railway Station Modernization", status: "Completed", css: "completed" }
                 ]
             },
             {
-                name: "Priya Singh",
-                role: "Mayor",
-                initials: "PS",
-                term: "2023 - 2028",
-                edu: "M.A. Political Science",
-                commitments: [
-                    { title: "Public Park Renovation", status: "No Update", css: "noupdate" },
-                    { title: "Waste Management Plant", status: "Ongoing", css: "ongoing" }
-                ]
-            },
-            {
-                name: "Rajesh Verma",
-                role: "MLA - Mathura Cantt",
-                initials: "RV",
+                name: "Yogi Adityanath", // Real CM
+                role: "Chief Minister (UP)",
+                initials: "YA",
                 term: "2022 - 2027",
-                edu: "L.L.B (Law)",
+                edu: "B.Sc Mathematics",
                 commitments: [
-                    { title: "School Digitalization", status: "Completed", css: "completed" },
-                    { title: "Clean Water Pipeline", status: "Ongoing", css: "ongoing" }
+                    { title: "Expressway Network", status: "Completed", css: "completed" },
+                    { title: "Film City Project", status: "Ongoing", css: "ongoing" }
+                ]
+            },
+            {
+                name: "Akhilesh Yadav", // Real Leader
+                role: "Leader of Opposition",
+                initials: "AY",
+                term: "2022 - 2027",
+                edu: "Masters in Environmental Eng.",
+                commitments: [
+                    { title: "Metro Expansion", status: "No Update", css: "noupdate" },
+                    { title: "IT Park Development", status: "Completed", css: "completed" }
                 ]
             }
         ];
 
-        // --- 2. RENDER LEADERS ---
+        // --- 2. RENDER LEADERS & VERIFY BUTTON ---
         function renderLeaders() {
             const grid = document.getElementById('leader-grid');
             
@@ -480,6 +514,12 @@
                                     <p>${l.edu}</p>
                                 </div>
                             </div>
+                            
+                            <button class="btn-verify" onclick="fetchMyNetaData('${l.name}')">
+                                <i class="fas fa-search-dollar"></i> Check Criminal & Financial Records
+                            </button>
+                            <div id="myneta-result-${l.name.replace(/\s/g, '')}" class="myneta-box" style="display:none;"></div>
+
                             <hr style="border:0; border-top:1px solid #eee; margin: 15px 0;">
                             <div style="font-size:0.8rem; font-weight:700; color:#b2bec3; margin-bottom:15px; text-transform:uppercase;">Commitment Tracker</div>
                             <div class="commitments-list">
@@ -492,7 +532,56 @@
             });
         }
 
-        // --- 3. AI SIMULATION FUNCTION ---
+        // --- 3. FETCH API FUNCTION (Connects to Python) ---
+        async function fetchMyNetaData(leaderName) {
+            const safeId = leaderName.replace(/\s/g, '');
+            const resultBox = document.getElementById(`myneta-result-${safeId}`);
+            
+            // UI: Show loading
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = '<div style="text-align:center; color:#666;"><i class="fas fa-spinner fa-spin"></i> Fetching official records from MyNeta...</div>';
+            resultBox.className = "myneta-box loading";
+
+            try {
+                // Call the Python Server running on port 5000
+                const response = await fetch(`http://127.0.0.1:5000/api/leader-details?name=${encodeURIComponent(leaderName)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    resultBox.innerHTML = `<span style="color:#c0392b; font-size:0.9rem;"><i class="fas fa-times-circle"></i> ${data.error}</span>`;
+                } else {
+                    resultBox.className = "myneta-box success";
+                    resultBox.innerHTML = `
+                        <div style="font-size:0.85rem; font-weight:bold; margin-bottom:10px; color:#d35400; border-bottom:1px solid #fae5d3; padding-bottom:5px;">
+                            <i class="fas fa-gavel"></i> OFFICIAL RECORD FOUND
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div style="text-align:center;">
+                                <span style="font-size:0.7rem; color:#666; font-weight:bold;">CRIMINAL CASES</span><br>
+                                <span style="font-size:1.2rem; font-weight:bold; color:${data.criminal_cases > 0 ? '#e74c3c' : '#27ae60'}">
+                                    ${data.criminal_cases}
+                                </span>
+                            </div>
+                            <div style="text-align:center;">
+                                <span style="font-size:0.7rem; color:#666; font-weight:bold;">TOTAL ASSETS</span><br>
+                                <span style="font-size:1rem; font-weight:bold; color:#2c3e50;">${data.assets}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px; font-size:0.75rem; text-align:right;">
+                            <a href="${data.source_url}" target="_blank" style="color:#3498db; text-decoration:none; font-weight:600;">View Full Source <i class="fas fa-external-link-alt"></i></a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                resultBox.innerHTML = `<div style="color:#c0392b; font-size:0.85rem;">
+                    <i class="fas fa-wifi"></i> <strong>Connection Error</strong><br>
+                    Is "server.py" running in your terminal?
+                </div>`;
+            }
+        }
+
+        // --- 4. AI SIMULATION FUNCTION ---
         function simplifyText() {
             const box = document.getElementById('ai-output-box');
             box.style.display = 'block';
@@ -504,7 +593,7 @@
             }, 1000);
         }
 
-        // --- 4. FORM SUBMISSION & TOAST ---
+        // --- 5. FORM SUBMISSION & TOAST ---
         function handleSubmit(e) {
             e.preventDefault();
             const toast = document.getElementById("toast");
@@ -512,7 +601,7 @@
             setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
-        // --- 5. INITIALIZATION ---
+        // --- 6. INITIALIZATION ---
         window.onload = function() {
             renderLeaders();
             // Simulate Geolocation
